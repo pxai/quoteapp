@@ -1,0 +1,71 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@7.2.1
+
+jobs:
+  verify:
+    machine:
+      image: ubuntu-2404:current
+    working_directory: ~/project
+    steps:
+      - checkout
+      - node/install:
+          node-version: "24.18.0"
+      - run:
+          name: Install backend dependencies
+          command: npm ci --prefix backend
+      - run:
+          name: Backend lint and unit tests
+          command: npm test --prefix backend
+      - run:
+          name: Install frontend dependencies
+          command: npm ci --prefix frontend
+      - run:
+          name: Install Playwright browser
+          command: cd frontend && npx playwright install --with-deps chromium
+      - run:
+          name: Start API with test database
+          command: |
+            POSTGRES_DSN='postgres://postgres:postgres@postgres:5432/test?sslmode=disable' \
+            CORS_ORIGIN='http://127.0.0.1:5173' \
+            docker compose up --build -d --wait api
+      - run:
+          name: Frontend lint, unit, and E2E tests
+          command: npm test --prefix frontend
+      - run:
+          name: Stop test services
+          command: docker compose down
+          when: always
+
+  build-staging:
+    docker:
+      - image: cimg/node:24.18.0
+    working_directory: ~/project
+    steps:
+      - checkout
+      - run:
+          name: Install frontend dependencies
+          command: npm ci --prefix frontend
+      - run:
+          name: Build frontend for staging
+          command: |
+            if [ -z "${STAGING_API_URL:-}" ]; then
+              echo "Set STAGING_API_URL in CircleCI project environment variables."
+              exit 1
+            fi
+            VITE_API_URL="$STAGING_API_URL" npm run build --prefix frontend -- --mode staging
+      - store_artifacts:
+          path: frontend/dist
+          destination: frontend-staging-build
+
+workflows:
+  test-and-build:
+    jobs:
+      - verify
+      - build-staging:
+          requires:
+            - verify
+          filters:
+            branches:
+              only: staging

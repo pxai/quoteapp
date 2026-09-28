@@ -1,5 +1,11 @@
 # Quote App
 
+## CircleCI
+
+CircleCI runs backend and frontend lint/tests on every branch using Node.js 24. The frontend checks include Playwright E2E tests against the Compose API and test database. On the `staging` branch, CircleCI also builds the frontend and stores `frontend/dist` as an artifact.
+
+Set the `STAGING_API_URL` environment variable in CircleCI project settings to the API URL that the staging frontend should use. The staging job builds an artifact; it does not deploy it.
+
 ## Run Tests
 
 Requires Docker Compose and Node.js 24. Run these commands from the repository root.
