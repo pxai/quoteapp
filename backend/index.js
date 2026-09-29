@@ -13,6 +13,8 @@ function getenv(key, def) {
 
 const redis = new Redis(getenv('REDIS_ADDR', 'localhost:6379'), {
   password: getenv('REDIS_PASSWORD', ''),
+  enableOfflineQueue: false,
+  lazyConnect: true,
 });
 
 redis.on('error', (err) => {
@@ -92,4 +94,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { createApp };
+module.exports = { createApp, redis };
