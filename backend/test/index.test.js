@@ -1,5 +1,5 @@
 const request = require('supertest');
-const { createApp } = require('../index');
+const { createApp, redis } = require('../index');
 
 describe('GET /', () => {
   let app;
@@ -37,5 +37,9 @@ describe('GET /', () => {
     expect(response.status).toBe(500);
     expect(response.body).toEqual({ error: 'database unavailable' });
     expect(client.release).toHaveBeenCalledTimes(1);
+  });
+
+  afterAll(() => {
+    redis.disconnect();
   });
 });
