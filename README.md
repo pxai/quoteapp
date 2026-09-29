@@ -1,5 +1,38 @@
 # Quote App
 
+## Run
+
+```sh
+ docker compose up . -d
+```
+
+## Stop it
+
+```sh
+ docker compose down  -v --remove-orphans
+```
+
+## Rebuild
+
+```sh
+docker compose down -v --remove-orphans && docker compose up -d --build
+```
+
+## Check logs
+
+```sh
+docker compose logs --tail 50
+docker compose logs -f --tail 100 api
+```
+
+## Connect to CLI
+
+```sh
+docker compose exec redis redis-cli
+docker compose exec postgres psql -U postgres -d dev
+```
+
+
 ## CircleCI
 
 CircleCI runs backend and frontend lint/tests on every branch using Node.js 24. The frontend checks include Playwright E2E tests against the Compose API and test database. On the `staging` branch, CircleCI also builds the frontend and stores `frontend/dist` as an artifact.
@@ -39,4 +72,37 @@ The frontend test script starts its own Vite server. After testing, restore the 
 
 ```sh
 docker compose up -d api
+```
+
+
+# ⚡ Redis CLI Cheat Sheet
+
+### 1. List Keys (Read All)
+```bash
+KEYS *
+```
+
+### 2. Create / Update
+```bash
+SET my_key "my_value"
+```
+
+### 3. Read Single Key
+```bash
+GET my_key
+```
+
+### 4. Delete
+```bash
+DEL my_key
+```
+
+### 5. Expiration & TTL
+* **Set expiration (seconds):** `EXPIRE my_key 60`
+* **Create with expiration:** `SETEX my_key 60 "my_value"`
+* **Check remaining time:** `TTL my_key` *(-1 = persistent, -2 = does not exist)*
+
+### 6. Wipe Database (Reset)
+```bash
+FLUSHALL
 ```
