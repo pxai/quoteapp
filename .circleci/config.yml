@@ -71,8 +71,13 @@ jobs:
               echo "Error: RENDER_STAGING_DEPLOY_HOOK env var is missing."
               exit 1
             fi
-            # Hace la petición HTTP POST para iniciar el deploy
+            if [ -z "${RENDER_FRONTEND_STAGING_DEPLOY_HOOK:-}" ]; then
+              echo "Error: RENDER_FRONTEND_STAGING_DEPLOY_HOOK env var is missing."
+              exit 1
+            fi
+            # Hace la petición HTTP POST para iniciar los deploys
             curl -X POST "$RENDER_STAGING_DEPLOY_HOOK"
+            curl -X POST "$RENDER_FRONTEND_STAGING_DEPLOY_HOOK"
 
 workflows:
   test-and-build:
