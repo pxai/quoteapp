@@ -15,6 +15,10 @@ const redis = new Redis(getenv('REDIS_ADDR', 'localhost:6379'), {
   password: getenv('REDIS_PASSWORD', ''),
 });
 
+redis.on('error', (err) => {
+  logger.warn({ err: err.message }, 'Redis connection error');
+});
+
 function createApp(pg) {
   const app = express();
   app.use(express.json());
