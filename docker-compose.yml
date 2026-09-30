@@ -26,6 +26,11 @@ services:
       CORS_ORIGIN: "${CORS_ORIGIN:-http://localhost:5173}"
       REDIS_ADDR: "${REDIS_ADDR:-redis:6379}"
       REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      NEW_RELIC_LICENSE_KEY: ${NEW_RELIC_LICENSE_KEY}
+      OTEL_SERVICE_NAME: "quoteapp"
+      OTEL_EXPORTER_OTLP_ENDPOINT: "${OTEL_EXPORTER_OTLP_ENDPOINT:-https://nr-data.net}"
+      OTEL_EXPORTER_OTLP_HEADERS: "api-key=${NEW_RELIC_LICENSE_KEY}"
+
     depends_on:
       postgres:
         condition: service_healthy
